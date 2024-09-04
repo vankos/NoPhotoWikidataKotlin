@@ -1,59 +1,47 @@
 package com.example.wikineedsphoto
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.wikineedsphoto.ui.theme.WikiNeedsPhotoTheme
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            WikiNeedsPhotoTheme {
-
-                MainPage(
-                )
-
-            }
-        }
-    }
-}
-
-@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Preview(){
-    MainPage()
-}
-
-@Composable
-fun MainPage(viewModel: AppSettings = AppSettings()) {
+fun MainPage(viewModel: AppSettings = AppSettings(
+    0.5f,
+    "hotel in\n" +
+            "hostel in\n" +
+            "guesthouse in\n" +
+            "apartment in\n" +
+            "neighborhood in"
+)) {
     // ContentPage Background color depending on theme
     val titleColor = if (isSystemInDarkTheme()) Color(0xFFFF7043) else Color(0xFFDE4436)
     val textColor = if (isSystemInDarkTheme()) Color(0xFFBDBDBD) else Color(0xFF757575)
+    val editorBackgroundColor = if (isSystemInDarkTheme()) Color(0xFF424242) else Color.White
+    val editorTextColor = if (isSystemInDarkTheme()) Color(0xFFE0E0E0) else Color(0xFF212121)
     val buttonColor = if (isSystemInDarkTheme()) Color(0xFFFF7043) else Color(0xFFDE4436)
 
     // Main content
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -87,9 +75,13 @@ fun MainPage(viewModel: AppSettings = AppSettings()) {
 
             // Search Radius Editor
             OutlinedTextField(
-                value = viewModel.searchRadiusDegrees,
-                onValueChange = { viewModel.searchRadiusDegrees = it },
+                value = viewModel.searchRadiusDegrees.toString(),
+                onValueChange = { viewModel.searchRadiusDegrees = it.toFloat() },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = editorBackgroundColor,
+                    unfocusedTextColor = editorTextColor
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -108,6 +100,10 @@ fun MainPage(viewModel: AppSettings = AppSettings()) {
                 value = viewModel.descriptionExclusions,
                 onValueChange = { viewModel.descriptionExclusions = it },
                 keyboardOptions = KeyboardOptions.Default,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor  = editorBackgroundColor,
+                    unfocusedTextColor = editorTextColor
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 100.dp)
@@ -118,7 +114,7 @@ fun MainPage(viewModel: AppSettings = AppSettings()) {
             Button(
                 onClick = { viewModel.getGpxCommand() },
                 enabled = viewModel.isNotBusy,
-                colors = ButtonDefaults.buttonColors(buttonColor),
+                colors = ButtonDefaults.buttonColors(containerColor  = buttonColor),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -128,21 +124,15 @@ fun MainPage(viewModel: AppSettings = AppSettings()) {
                     text = viewModel.buttonText,
                     color = Color.White,
                     fontSize = 16.sp,
-                    modifier = Modifier.padding(3.dp)
+                    modifier = Modifier.padding(8.dp)
                 )
             }
         }
-
-}
-
-// Mocked ViewModel for demonstration
-class AppSettings {
-    var searchRadiusDegrees by mutableStateOf("")
-    var descriptionExclusions by mutableStateOf("")
-    val isNotBusy = true
-    val buttonText = "Get GPX"
-
-    fun getGpxCommand() {
-        // Logic to get GPX
     }
+
+@Preview
+@Composable
+fun Preview(){
+    MainPage()
 }
+
