@@ -1,7 +1,9 @@
 package com.example.wikineedsphoto
 
+import kotlinx.serialization.SerialName
+
 data class Binding(
-    @JsonProperty("q")
+    @SerialName("q")
     var link: WikimediaLink,
     var location: Location,
     var desc: Desc?,
@@ -16,7 +18,7 @@ data class Commonscat(
 )
 
 data class Desc(
-    @JsonProperty("xml:lang")
+    @SerialName("xml:lang")
     var xmllang: String,
     var type: String,
     var value: String
@@ -43,7 +45,7 @@ data class WikimediaLink(
 )
 
 data class QLabel(
-    @JsonProperty("xml:lang")
+    @SerialName("xml:lang")
     var xmllang: String,
     var type: String,
     var value: String

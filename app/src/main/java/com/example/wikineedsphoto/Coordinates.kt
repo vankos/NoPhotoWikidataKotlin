@@ -13,9 +13,9 @@ class Coordinates {
 
     constructor()
 
-    constructor(latitude: String, longitude: String) {
-        this.latitude = latitude.toDouble()
-        this.longitude = longitude.toDouble()
+    constructor(latitude: Double, longitude: Double) {
+        this.latitude = latitude
+        this.longitude = longitude
     }
 
     val latitudeString: String

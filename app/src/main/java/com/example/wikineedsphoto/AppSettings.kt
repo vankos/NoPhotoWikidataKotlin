@@ -16,5 +16,7 @@ class AppSettings (
     val buttonText = "Get GPX"
 
     fun getGpxCommand(location: Location) {
+
+        val coordinates = Coordinates(location.latitude, location.longitude)
     }
 }
