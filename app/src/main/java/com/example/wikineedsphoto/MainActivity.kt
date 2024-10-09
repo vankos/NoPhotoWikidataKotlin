@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainPage(viewModel: AppSettings = AppSettings(
-        0.5f,
+        0.5,
         "hotel in\n" +
                 "hostel in\n" +
                 "guesthouse in\n" +
@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
             // Search Radius Editor
             OutlinedTextField(
                 value = viewModel.searchRadiusDegrees.toString(),
-                onValueChange = { viewModel.searchRadiusDegrees = it.toFloat() },
+                onValueChange = { viewModel.searchRadiusDegrees = it.toDouble() },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor = editorBackgroundColor,

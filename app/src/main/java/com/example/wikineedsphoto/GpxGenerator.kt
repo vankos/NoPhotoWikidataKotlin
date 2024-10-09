@@ -42,7 +42,7 @@ class GpxGenerator {
         val coordinatesString = location.location.value
         val latitude = Regex(latitudeRegexp).find(coordinatesString)?.groupValues?.get(1) ?: ""
         val longitude = Regex(longitudeRegexp).find(coordinatesString)?.groupValues?.get(1) ?: ""
-        return Coordinates(latitude, longitude)
+        return Coordinates(latitude.toDouble(), longitude.toDouble())
     }
 
     private fun getDescription(location: Binding): String {

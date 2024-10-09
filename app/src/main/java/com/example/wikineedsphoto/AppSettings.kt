@@ -1,12 +1,13 @@
 package com.example.wikineedsphoto
 
+import QueryService
 import android.location.Location
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 class AppSettings (
-    searchRadiusDegrees : Float,
+    searchRadiusDegrees : Double,
     descriptionExclusions : String
     ) {
 
@@ -18,5 +19,7 @@ class AppSettings (
     fun getGpxCommand(location: Location) {
 
         val coordinates = Coordinates(location.latitude, location.longitude)
+        val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees);
+        val locations: List<Binding> = queryResult!!.results.bindings
     }
 }

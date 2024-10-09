@@ -1,5 +1,7 @@
 [versions]
 agp = "8.5.2"
+googlePlayServicesLocation = "21.3.0"
+jacksonModuleKotlin = "2.15.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -12,6 +14,8 @@ composeBom = "2024.04.01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+google-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "googlePlayServicesLocation" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonModuleKotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
