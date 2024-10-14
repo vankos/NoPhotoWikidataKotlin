@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.net.URL
+import java.net.URLEncoder
 import java.util.Locale
 
 object QueryService {
@@ -39,7 +40,7 @@ object QueryService {
             } LIMIT 3000
         """.trimIndent()
 
-        val url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=${URL(query).encodeURL()}&format=json"
+        val url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=${URLEncoder.encode(query)}&format=json"
         return try {
             val response = URL(url).readText()
             jacksonObjectMapper().readValue<WikidataQueryResult>(response)
