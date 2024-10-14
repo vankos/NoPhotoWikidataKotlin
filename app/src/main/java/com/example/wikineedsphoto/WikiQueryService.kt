@@ -3,6 +3,11 @@ import com.example.wikineedsphoto.WikidataQueryResult
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.net.URL
 import java.net.URLEncoder
 import java.util.Locale
@@ -42,10 +47,29 @@ object QueryService {
 
         val url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=${URLEncoder.encode(query)}&format=json"
         return try {
-            val response = URL(url).readText()
-            jacksonObjectMapper().readValue<WikidataQueryResult>(response)
+            var response  = runBlocking {
+                getWikiLocationsForLocation(url)
+            }
+            if(response != null) {
+                var result = jacksonObjectMapper().readValue<WikidataQueryResult>(response)
+                return result
+            }
+
+            return null
         } catch (ex: Exception) {
             println("Error: ${ex.message}")
+            null
+        }
+    }
+
+    suspend fun getWikiLocationsForLocation(url: String): String? {
+        return try {
+            // Switch to IO dispatcher to perform network operations off the main thread
+            withContext(Dispatchers.IO) {
+                URL(url).readText()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
