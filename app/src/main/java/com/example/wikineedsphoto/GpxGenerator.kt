@@ -24,7 +24,7 @@ class GpxGenerator {
             xmlSerializer.attribute("","lat", coordinates.latitudeString)
             xmlSerializer.attribute("","lon", coordinates.longitudeString)
             xmlSerializer.startTag("", "name")
-            xmlSerializer.text(location.qLabel.value)
+            xmlSerializer.text(location.qLabel?.value)
             xmlSerializer.endTag("", "name")
             xmlSerializer.startTag("", "desc")
             xmlSerializer.text(getDescription(location))
@@ -39,14 +39,14 @@ class GpxGenerator {
     }
 
     private fun getCoordinates(location: Binding): Coordinates {
-        val coordinatesString = location.location.value
+        val coordinatesString = location.location?.value ?: return Coordinates()
         val latitude = Regex(latitudeRegexp).find(coordinatesString)?.groupValues?.get(1) ?: ""
         val longitude = Regex(longitudeRegexp).find(coordinatesString)?.groupValues?.get(1) ?: ""
         return Coordinates(latitude.toDouble(), longitude.toDouble())
     }
 
     private fun getDescription(location: Binding): String {
-        val url = location.link.value
+        val url = location.link?.value
         val description = location.desc?.value ?: ""
         val gpxDescription = "$description.\n $url"
         return gpxDescription

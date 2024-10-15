@@ -69,5 +69,5 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.jackson.module.kotlin)
     implementation (libs.google.play.services.location)
-
+    implementation(libs.kotlinx.coroutines.android)
 }

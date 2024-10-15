@@ -24,7 +24,7 @@ class AppSettings (
         locationHelper.getCurrentLocation { location ->
             val coordinates = Coordinates(location!!.latitude, location.longitude)
             val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees);
-            val locations: List<Binding> = queryResult!!.results.bindings
+            val locations: List<Binding>? = queryResult?.results?.bindings
         }
 
     }
