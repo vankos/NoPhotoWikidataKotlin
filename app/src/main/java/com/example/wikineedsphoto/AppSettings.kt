@@ -25,6 +25,14 @@ class AppSettings (
             val coordinates = Coordinates(location!!.latitude, location.longitude)
             val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees);
             val locations: List<Binding>? = queryResult?.results?.bindings
+            val exclusions = descriptionExclusions.split("\n")
+            val locationFilter = LocationFilter()
+            if(locations == null){
+                return@getCurrentLocation
+            }
+
+            val locationsWithoutImage = locationFilter.filterByDoesntHaveImage(locations)
+
         }
 
     }
