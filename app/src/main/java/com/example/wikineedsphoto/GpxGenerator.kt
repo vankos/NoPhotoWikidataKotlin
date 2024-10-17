@@ -13,7 +13,7 @@ class GpxGenerator {
         val writer = StringWriter()
         xmlSerializer.setOutput(writer)
         xmlSerializer.startDocument("UTF-8", false)
-        xmlSerializer.startTag("gpx", "http://www.topografix.com/GPX/1/1")
+        xmlSerializer.startTag("http://www.topografix.com/GPX/1/1", "gpx")
         xmlSerializer.attribute("", "version", "1.1")
         xmlSerializer.attribute("","creator", "WikiShootMe-to-GPX")
 
@@ -32,7 +32,7 @@ class GpxGenerator {
             xmlSerializer.endTag("", "wpt")
         }
 
-        xmlSerializer.endTag("", "gpx")
+        xmlSerializer.endTag("http://www.topografix.com/GPX/1/1", "gpx")
         xmlSerializer.endDocument()
 
         return writer.toString()

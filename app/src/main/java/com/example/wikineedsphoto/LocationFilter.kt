@@ -3,7 +3,7 @@ package com.example.wikineedsphoto
 class LocationFilter {
     fun filterByHaveExclusionsInDescription(
         locations: Iterable<Binding>,
-        excludedDescriptionWords: Array<String>
+        excludedDescriptionWords: List<String>
     ): List<Binding> {
         val filteredLocations = mutableListOf<Binding>()
         for (location in locations) {
@@ -32,7 +32,7 @@ class LocationFilter {
         return filteredLocations
     }
 
-    private fun locationShouldBeExcluded(location: Binding, excludedDescriptionWords: Array<String>): Boolean {
+    private fun locationShouldBeExcluded(location: Binding, excludedDescriptionWords: List<String>): Boolean {
         for (exclusion in excludedDescriptionWords) {
             if (location.desc?.value?.contains(exclusion, ignoreCase = true) == true) {
                 return true
