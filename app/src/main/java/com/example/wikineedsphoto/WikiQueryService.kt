@@ -1,5 +1,6 @@
 import com.example.wikineedsphoto.Coordinates
 import com.example.wikineedsphoto.WikidataQueryResult
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -74,10 +75,13 @@ object QueryService {
         }
     }
 
-    fun getLocationNameFromCoordinates(coordinates: Coordinates): String? {
+    suspend fun getLocationNameFromCoordinates(coordinates: Coordinates): String? {
         val queryUrl = "https://nominatim.openstreetmap.org/reverse?lat=${coordinates.latitudeString}&lon=${coordinates.longitudeString}&format=json"
         return try {
-            val jsonResponse = URL(queryUrl).readText()
+            val jsonResponse = withContext(Dispatchers.IO) {
+                 URL(queryUrl).readText()
+            }
+
             val locationInfo: LocationInfoRequestResult = jacksonObjectMapper().readValue(jsonResponse)
             getLocationNameFromLocationInfo(locationInfo)
         } catch (ex: Exception) {
@@ -118,63 +122,13 @@ object QueryService {
     private fun URL.encodeURL(): String = this.toString().replace(" ", "%20")
 }
 
-data class Root(
-    val head: Head,
-    val results: Results,
-)
-
-data class Head(
-    val vars: List<String>,
-)
-
-data class Results(
-    val bindings: List<Binding>,
-)
-
-data class Binding(
-    val q: Q,
-    val location: Location,
-    val image: Image?,
-    val commonscat: Commonscat?,
-    val desc: Desc,
-    val qLabel: QLabel,
-)
-
-data class Q(
-    val type: String,
-    val value: String,
-)
-
 data class Location(
     val datatype: String,
     val type: String,
     val value: String,
 )
 
-data class Image(
-    val type: String,
-    val value: String,
-)
-
-data class Commonscat(
-    val type: String,
-    val value: String,
-)
-
-data class Desc(
-    @JsonProperty("xml:lang")
-    val xmlLang: String,
-    val type: String,
-    val value: String,
-)
-
-data class QLabel(
-    @JsonProperty("xml:lang")
-    val xmlLang: String,
-    val type: String,
-    val value: String
-)
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Address(
     val tourism: String? = null,
     val road: String? = null,
@@ -189,18 +143,19 @@ data class Address(
     val country_code: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class LocationInfoRequestResult(
-    val place_id: Int,
-    val licence: String,
-    val osm_type: String,
-    val osm_id: Long,
-    val lat: String,
-    val lon: String,
+    val place_id: Int?,
+    val licence: String?,
+    val osm_type: String?,
+    val osm_id: Long?,
+    val lat: String?,
+    val lon: String?,
     @JsonProperty("class")
-    val className: String,
-    val type: String,
-    val place_rank: Int,
-    val importance: Double,
+    val className: String?,
+    val type: String?,
+    val place_rank: Int?,
+    val importance: Double?,
     val addresstype: String? = null,
     val name: String? = null,
     val display_name: String? = null,
