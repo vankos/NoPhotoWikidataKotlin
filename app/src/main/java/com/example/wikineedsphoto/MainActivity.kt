@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainPage(viewModel: AppSettings = AppSettings(
-        0.5,
+        0.05,
         "hotel in\n" +
                 "hostel in\n" +
                 "guesthouse in\n" +
