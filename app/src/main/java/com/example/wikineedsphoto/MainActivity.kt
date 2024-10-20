@@ -1,7 +1,7 @@
 package com.example.wikineedsphoto
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,10 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationToken
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 class MainActivity : ComponentActivity() {
@@ -65,8 +63,14 @@ class MainActivity : ComponentActivity() {
         val editorBackgroundColor = if (isSystemInDarkTheme()) Color(0xFF424242) else Color.White
         val editorTextColor = if (isSystemInDarkTheme()) Color(0xFFE0E0E0) else Color(0xFF212121)
         val buttonColor = if (isSystemInDarkTheme()) Color(0xFFFF7043) else Color(0xFFDE4436)
+        val context = LocalContext.current
+        val sharedPreferences = remember {
+            context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)}
+        val savedExclusions = loadText(sharedPreferences)
+        if(savedExclusions.isNotEmpty())
+            viewModel.descriptionExclusions = savedExclusions
 
-        // Main content
+            // Main content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,7 +127,10 @@ class MainActivity : ComponentActivity() {
             // Search Exclusions Editor
             OutlinedTextField(
                 value = viewModel.descriptionExclusions,
-                onValueChange = { viewModel.descriptionExclusions = it },
+                onValueChange = {
+                    viewModel.descriptionExclusions = it
+                    saveText(sharedPreferences, it)
+                },
                 keyboardOptions = KeyboardOptions.Default,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor  = editorBackgroundColor,
@@ -178,6 +185,17 @@ class MainActivity : ComponentActivity() {
         viewModel.getGpxCommand(this)
         return
     }
+
+    // Helper function to load the text from SharedPreferences
+    private fun loadText(sharedPreferences: SharedPreferences): String {
+        return sharedPreferences.getString("text_key", "") ?: ""
+    }
+
+    // Helper function to save the text to SharedPreferences
+    private fun saveText(sharedPreferences: SharedPreferences, text: String) {
+        sharedPreferences.edit().putString("text_key", text).apply()
+    }
+
 
     @Preview
     @Composable

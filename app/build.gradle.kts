@@ -70,4 +70,6 @@ dependencies {
     implementation(libs.jackson.module.kotlin)
     implementation (libs.google.play.services.location)
     implementation(libs.kotlinx.coroutines.android)
+    implementation (libs.androidx.preference.ktx)
+
 }

@@ -9,6 +9,7 @@ import android.net.Uri
 import android.provider.ContactsContract.Directory.PACKAGE_NAME
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.runBlocking
