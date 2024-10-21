@@ -66,9 +66,12 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         val sharedPreferences = remember {
             context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)}
-        val savedExclusions = loadText(sharedPreferences)
+        val savedExclusions = loadText(sharedPreferences, "exclusion")
         if(savedExclusions.isNotEmpty())
             viewModel.descriptionExclusions = savedExclusions
+        val savedRadius = loadText(sharedPreferences, "searchRadius")
+        if(savedRadius.isNotEmpty())
+            viewModel.searchRadiusDegrees = savedRadius.toDouble()
 
             // Main content
         Column(
@@ -105,7 +108,10 @@ class MainActivity : ComponentActivity() {
             // Search Radius Editor
             OutlinedTextField(
                 value = viewModel.searchRadiusDegrees.toString(),
-                onValueChange = { viewModel.searchRadiusDegrees = it.toDouble() },
+                onValueChange = {
+                    viewModel.searchRadiusDegrees = it.toDouble()
+                    saveText(sharedPreferences, "searchRadius", it)
+                    },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor = editorBackgroundColor,
@@ -129,7 +135,7 @@ class MainActivity : ComponentActivity() {
                 value = viewModel.descriptionExclusions,
                 onValueChange = {
                     viewModel.descriptionExclusions = it
-                    saveText(sharedPreferences, it)
+                    saveText(sharedPreferences, "exclusion", it)
                 },
                 keyboardOptions = KeyboardOptions.Default,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -187,13 +193,13 @@ class MainActivity : ComponentActivity() {
     }
 
     // Helper function to load the text from SharedPreferences
-    private fun loadText(sharedPreferences: SharedPreferences): String {
-        return sharedPreferences.getString("text_key", "") ?: ""
+    private fun loadText(sharedPreferences: SharedPreferences, key: String): String {
+        return sharedPreferences.getString(key, "") ?: ""
     }
 
     // Helper function to save the text to SharedPreferences
-    private fun saveText(sharedPreferences: SharedPreferences, text: String) {
-        sharedPreferences.edit().putString("text_key", text).apply()
+    private fun saveText(sharedPreferences: SharedPreferences, key: String, text: String) {
+        sharedPreferences.edit().putString(key, text).apply()
     }
 
 
