@@ -24,11 +24,10 @@ class AppSettings (
 
     var searchRadiusDegrees by mutableStateOf(searchRadiusDegrees)
     var descriptionExclusions by mutableStateOf(descriptionExclusions)
-    val isNotBusy = true
     val buttonText = "Get GPX"
     val DefualtGpxFileNamePrefix = "NoPhotoLocations_.";
 
-    fun getGpxCommand(context: Context) {
+    fun  getGpxCommand(context: Context, onFinished: () -> Unit ) {
 
         val locationHelper = LocationHelper(context);
         locationHelper.getCurrentLocation { location ->
@@ -59,6 +58,8 @@ class AppSettings (
                 setDataAndType(uri, "application/octet-stream")
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
+
+            onFinished()
             context.startActivity(Intent.createChooser(intent, "Open test.gpx"))
         }
 

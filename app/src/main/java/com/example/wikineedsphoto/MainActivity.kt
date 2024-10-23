@@ -14,15 +14,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 class MainActivity : ComponentActivity() {
@@ -148,27 +157,40 @@ class MainActivity : ComponentActivity() {
                     .padding(vertical = 8.dp)
             )
 
+            var loading by remember { mutableStateOf(false)}
+
             // Action Button
             Button(
-                onClick = { GetGpx(viewModel) },
-                enabled = viewModel.isNotBusy,
+                onClick = {
+                    loading = true
+                    GetGpx(viewModel){
+                        loading = false
+                    }
+                          },
+                enabled = !loading,
                 colors = ButtonDefaults.buttonColors(containerColor  = buttonColor),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(70.dp)
                     .padding(top = 10.dp),
             ) {
-                Text(
-                    text = viewModel.buttonText,
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
+                if (loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(50.dp)
+                    )
+                }
+                else {
+                    Text(
+                        text = viewModel.buttonText,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(8.dp))
+                }
             }
         }
     }
 
-    private fun GetGpx(viewModel: AppSettings) {
+    private fun GetGpx(viewModel: AppSettings, onFinished: () -> Unit) {
 //        if (ActivityCompat.checkSelfPermission(
 //                this,
 //                Manifest.permission.ACCESS_FINE_LOCATION
@@ -188,7 +210,7 @@ class MainActivity : ComponentActivity() {
 //        }
 
         //viewModel.getGpxCommand(fusedLocationClient.lastLocation.result)
-        viewModel.getGpxCommand(this)
+        viewModel.getGpxCommand(this, onFinished)
         return
     }
 
