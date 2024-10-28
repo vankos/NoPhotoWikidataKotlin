@@ -63,7 +63,7 @@ object QueryService {
         }
     }
 
-    suspend fun getWikiLocationsForLocation(url: String): String? {
+    private suspend fun getWikiLocationsForLocation(url: String): String? {
         return try {
             // Switch to IO dispatcher to perform network operations off the main thread
             withContext(Dispatchers.IO) {

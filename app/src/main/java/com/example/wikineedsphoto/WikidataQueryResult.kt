@@ -5,8 +5,7 @@ import kotlinx.serialization.SerialName
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Binding(
-    @SerialName("q")
-    var link: WikimediaLink?,
+    var q: WikimediaLink?,
     var location: Location?,
     var desc: Desc?,
     var qLabel: QLabel?,
