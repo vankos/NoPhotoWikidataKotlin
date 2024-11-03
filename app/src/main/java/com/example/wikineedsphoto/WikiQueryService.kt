@@ -31,19 +31,25 @@ object QueryService {
         )
 
         val query = """
-            SELECT ?q ?qLabel ?location ?image ?reason ?desc ?commonscat ?street WHERE {
-            SERVICE wikibase:box { 
+            SELECT ?q ?qLabel ?location ?image ?desc (GROUP_CONCAT(DISTINCT ?instanceOfLabel; separator=", ") AS ?instanceOfLabels) WHERE {
+              SERVICE wikibase:box { 
                 ?q wdt:P625 ?location . 
                 bd:serviceParam wikibase:cornerSouthWest "Point(${southWestCorner.longitudeString} ${southWestCorner.latitudeString})"^^geo:wktLiteral . 
-                bd:serviceParam wikibase:cornerNorthEast "Point(${northEastCorner.longitudeString} ${northEastCorner.latitudeString})"^^geo:wktLiteral } 
-            OPTIONAL { ?q wdt:P18 ?image } 
-            OPTIONAL { ?q wdt:P373 ?commonscat } 
-            OPTIONAL { ?q wdt:P969 ?street } 
-            SERVICE wikibase:label { 
+                bd:serviceParam wikibase:cornerNorthEast "Point(${northEastCorner.longitudeString} ${northEastCorner.latitudeString})"^^geo:wktLiteral 
+              } 
+              OPTIONAL { ?q wdt:P18 ?image } 
+              OPTIONAL { ?q wdt:P31 ?instanceOf . 
+                         ?instanceOf rdfs:label ?instanceOfLabel . 
+                         FILTER (LANG(?instanceOfLabel) = "en") 
+              }
+              SERVICE wikibase:label { 
                 bd:serviceParam wikibase:language "en,en,de,fr,es,it,nl,ru" . 
-                ?q schema:description ?desc . ?q rdfs:label ?qLabel 
+                ?q schema:description ?desc . 
+                ?q rdfs:label ?qLabel 
+              } 
             } 
-            } LIMIT 3000
+            GROUP BY ?q ?qLabel ?location ?image ?desc
+            LIMIT 3000
         """.trimIndent()
 
         val url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=${URLEncoder.encode(query)}&format=json"

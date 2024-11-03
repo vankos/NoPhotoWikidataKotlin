@@ -10,14 +10,9 @@ data class Binding(
     var desc: Desc?,
     var qLabel: QLabel?,
     var image: Image?,
-    var commonscat: Commonscat?
+    var instanceOfLabels: Desc
 )
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Commonscat(
-    var type: String?,
-    var value: String?
-)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Desc(
