@@ -10,7 +10,7 @@ data class Binding(
     var desc: Desc?,
     var qLabel: QLabel?,
     var image: Image?,
-    var instanceOfLabels: Desc
+    var instanceOfLabels: Desc?
 )
 
 

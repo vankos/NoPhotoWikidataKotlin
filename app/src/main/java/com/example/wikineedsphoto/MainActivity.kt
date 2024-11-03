@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
 
             // Search Exclusions Label
             Text(
-                text = "Search Exclusions - Exclude points with these words in description. Separate by new line:",
+                text = "Search Exclusions - Exclude points with these \"instance of\". Separate by new line:",
                 fontSize = 18.sp,
                 color = textColor,
                 modifier = Modifier.align(Alignment.Start)

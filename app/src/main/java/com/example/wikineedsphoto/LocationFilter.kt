@@ -7,7 +7,7 @@ class LocationFilter {
     ): List<Binding> {
         val filteredLocations = mutableListOf<Binding>()
         for (location in locations) {
-            if (location.desc?.value == null) {
+            if (location.instanceOfLabels?.value == null) {
                 filteredLocations.add(location)
                 continue
             }
@@ -34,7 +34,7 @@ class LocationFilter {
 
     private fun locationShouldBeExcluded(location: Binding, excludedDescriptionWords: List<String>): Boolean {
         for (exclusion in excludedDescriptionWords) {
-            if (location.desc?.value?.contains(exclusion, ignoreCase = true) == true) {
+            if (location.instanceOfLabels?.value?.equals(exclusion, ignoreCase = true) == true) {
                 return true
             }
         }
