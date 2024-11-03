@@ -60,11 +60,12 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainPage(viewModel: AppSettings = AppSettings(
         0.05,
-        "hotel in\n" +
-                "hostel in\n" +
-                "guesthouse in\n" +
-                "apartment in\n" +
-                "neighborhood in"
+        "hotel\n" +
+                "hostel\n" +
+                "guest house\n" +
+                "apartment\n" +
+                "neighborhood\n"+
+                "administrative territorial entity\n"
     )) {
         // ContentPage Background color depending on theme
         val titleColor = if (isSystemInDarkTheme()) Color(0xFFFF7043) else Color(0xFFDE4436)
