@@ -49,7 +49,7 @@ class GpxGenerator {
         val url = location.q?.value
         val description = location.desc?.value ?: ""
         val instanceOf = location.instanceOfLabels?.value ?: ""
-        val gpxDescription = "Instance of $instanceOf<br>Desc$description<br>$url"
+        val gpxDescription = "$instanceOf<br>$description<br>$url"
         return gpxDescription
     }
 
