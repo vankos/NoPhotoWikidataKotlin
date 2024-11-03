@@ -65,7 +65,11 @@ class MainActivity : ComponentActivity() {
                 "guest house\n" +
                 "apartment\n" +
                 "neighborhood\n"+
-                "administrative territorial entity\n"
+                "quarter\n"+
+                "mahalle\n"+
+                "battle\n"+
+                "ancient city\n"+
+                "siege"
     )) {
         // ContentPage Background color depending on theme
         val titleColor = if (isSystemInDarkTheme()) Color(0xFFFF7043) else Color(0xFFDE4436)
