@@ -54,9 +54,7 @@ object QueryService {
 
         val url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=${URLEncoder.encode(query)}&format=json"
         return try {
-            var response  = runBlocking {
-                getWikiLocationsForLocation(url)
-            }
+            var response = getWikiLocationsForLocation(url)
             if(response != null) {
                 var result = jacksonObjectMapper().readValue<WikidataQueryResult>(response)
                 return result
@@ -69,12 +67,9 @@ object QueryService {
         }
     }
 
-    private suspend fun getWikiLocationsForLocation(url: String): String? {
+    private fun getWikiLocationsForLocation(url: String): String? {
         return try {
-            // Switch to IO dispatcher to perform network operations off the main thread
-            withContext(Dispatchers.IO) {
                 URL(url).readText()
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             null
