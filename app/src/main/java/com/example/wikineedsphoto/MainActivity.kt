@@ -181,7 +181,9 @@ class MainActivity : ComponentActivity() {
             ) {
                 if (loading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.width(50.dp)
+                        modifier = Modifier
+                            .width(40.dp) 
+                            .padding(8.dp)
                     )
                 }
                 else {
