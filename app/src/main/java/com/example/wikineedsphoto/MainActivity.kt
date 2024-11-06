@@ -129,7 +129,8 @@ class MainActivity : ComponentActivity() {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor = editorBackgroundColor,
-                    unfocusedTextColor = editorTextColor
+                    unfocusedTextColor = editorTextColor,
+                    focusedTextColor = editorTextColor
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +155,8 @@ class MainActivity : ComponentActivity() {
                 keyboardOptions = KeyboardOptions.Default,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor  = editorBackgroundColor,
-                    unfocusedTextColor = editorTextColor
+                    unfocusedTextColor = editorTextColor,
+                    focusedTextColor = editorTextColor
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
