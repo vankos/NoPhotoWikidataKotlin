@@ -34,19 +34,17 @@ class AppSettings (
     val DefualtGpxFileNamePrefix = "NoPhotoLocations_.";
 
     fun  getGpxCommand(context: Context, onFinished: () -> Unit ) {
-        viewModelScope.launch{
-            withContext(Dispatchers.IO) {getGpxCommandInternal(context, onFinished)}
-        }
-
-    }
-
-    private suspend fun getGpxCommandInternal(context: Context, onFinished: () -> Unit ){
         val locationHelper = LocationHelper(context);
-        var coordinates = Coordinates()
+        var coordinates: Coordinates
         locationHelper.getCurrentLocation { location ->
             coordinates = Coordinates(location!!.latitude, location.longitude)
+            viewModelScope.launch{
+                withContext(Dispatchers.IO) {getGpxCommandInternal(context, coordinates, onFinished)}
+            }
         }
+    }
 
+    private suspend fun getGpxCommandInternal(context: Context,coordinates : Coordinates, onFinished: () -> Unit ){
         val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees);
         val locations: List<Binding>? = queryResult?.results?.bindings
         val locationFilter = LocationFilter()
