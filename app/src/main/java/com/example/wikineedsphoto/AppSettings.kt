@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.ContactsContract.Directory.PACKAGE_NAME
+import androidx.annotation.BoolRes
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,10 +35,16 @@ class AppSettings (
     val buttonText = "Get GPX"
     val DefualtGpxFileNamePrefix = "NoPhotoLocations_.";
 
-    fun  getGpxCommand(context: Context, onFinished: () -> Unit ) {
+    fun  getGpxCommand(context: Context, onFinished: (Boolean) -> Unit ) {
         val locationHelper = LocationHelper(context);
         var coordinates: Coordinates
         locationHelper.getCurrentLocation { location ->
+            if(location == null)
+            {
+                onFinished(false)
+                return@getCurrentLocation
+            }
+
             coordinates = Coordinates(location!!.latitude, location.longitude)
             viewModelScope.launch{
                 withContext(Dispatchers.IO) {getGpxCommandInternal(context, coordinates, onFinished)}
@@ -44,11 +52,12 @@ class AppSettings (
         }
     }
 
-    private suspend fun getGpxCommandInternal(context: Context,coordinates : Coordinates, onFinished: () -> Unit ){
+    private suspend fun getGpxCommandInternal(context: Context,coordinates : Coordinates, onFinished: (Boolean) -> Unit ){
         val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees);
         val locations: List<Binding>? = queryResult?.results?.bindings
         val locationFilter = LocationFilter()
         if(locations == null){
+            onFinished(true)
             return
         }
 
@@ -70,7 +79,7 @@ class AppSettings (
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/octet-stream")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            onFinished()
+            onFinished(true)
         }
 
         context.startActivity(Intent.createChooser(intent, "Open test.gpx"))

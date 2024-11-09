@@ -1,8 +1,11 @@
 package com.example.wikineedsphoto
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,13 +19,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,9 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 class MainActivity : ComponentActivity() {
@@ -165,6 +167,7 @@ class MainActivity : ComponentActivity() {
             )
 
             var loading by remember { mutableStateOf(false)}
+            var hasLocationAccess by remember { mutableStateOf(true)}
 
             // Action Button
             Button(
@@ -172,6 +175,7 @@ class MainActivity : ComponentActivity() {
                     loading = true
                     GetGpx(viewModel){
                         loading = false
+                        hasLocationAccess = it
                     }
                           },
                 enabled = !loading,
@@ -181,10 +185,39 @@ class MainActivity : ComponentActivity() {
                     .height(70.dp)
                     .padding(top = 10.dp),
             ) {
+                if(!hasLocationAccess)
+                {
+                    AlertDialog(
+                        title = {
+                            Text(text = "Permission not granted")
+                        },
+                        text = {
+                            Text(text = "Please grant location permission")
+                        },
+                        onDismissRequest = {
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    val intent: Intent =
+                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                    val uri = Uri.fromParts("package", applicationContext.packageName, null)
+                                    intent.setData(uri)
+                                    startActivity(intent)
+                                }
+                            ) {
+                                Text("Open app settings")
+                            }
+                        },
+                        dismissButton = {
+                        }
+                    )
+                }
+
                 if (loading) {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .width(40.dp) 
+                            .width(40.dp)
                             .padding(8.dp)
                     )
                 }
@@ -199,7 +232,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun GetGpx(viewModel: AppSettings, onFinished: () -> Unit) {
+    private fun GetGpx(viewModel: AppSettings, onFinished: (Boolean) -> Unit) {
 //        if (ActivityCompat.checkSelfPermission(
 //                this,
 //                Manifest.permission.ACCESS_FINE_LOCATION
