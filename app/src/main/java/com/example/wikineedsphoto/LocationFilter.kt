@@ -35,8 +35,9 @@ class LocationFilter {
     private fun locationShouldBeExcluded(location: Binding, excludedDescriptionWords: List<String>): Boolean {
         val instancesOf = location.instanceOfLabels?.value?.split(",") ?: return false
         for (instanceOf in instancesOf) {
+            val instanceOfTrimmed = instanceOf.trim()
             for (exclusion in excludedDescriptionWords) {
-                if (instanceOf.equals(exclusion,ignoreCase = true)) {
+                if (instanceOfTrimmed.equals(exclusion,ignoreCase = true)) {
                     return true
                 }
             }
