@@ -42,6 +42,13 @@ object QueryService {
                          ?instanceOf rdfs:label ?instanceOfLabel . 
                          FILTER (LANG(?instanceOfLabel) = "en") 
               }
+              OPTIONAL { ?q wdt:P576 ?discontinuedDate }
+              OPTIONAL { 
+                  ?q wdt:P5816 ?status
+              }
+              FILTER(!BOUND(?discontinuedDate))
+              FILTER(!BOUND(?status) || ?status = wdt:Q56556915)
+              
               SERVICE wikibase:label { 
                 bd:serviceParam wikibase:language "en,en,de,fr,es,it,nl,ru" . 
                 ?q schema:description ?desc . 
