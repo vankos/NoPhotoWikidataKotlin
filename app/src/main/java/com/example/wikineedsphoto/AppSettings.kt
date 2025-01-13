@@ -53,19 +53,19 @@ class AppSettings (
     }
 
     private suspend fun getGpxCommandInternal(context: Context,coordinates : Coordinates, onFinished: (Boolean) -> Unit ){
-        val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees);
-        val locations: List<Binding>? = queryResult?.results?.bindings
+        val exclusions = descriptionExclusions.split("\n")
+        val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees, exclusions);
+        val locationsWithoutImage: List<Binding>? = queryResult?.results?.bindings
         val locationFilter = LocationFilter()
-        if(locations == null){
+        if(locationsWithoutImage == null){
             onFinished(true)
             return
         }
 
-        val locationsWithoutImage = locationFilter.filterByDoesntHaveImage(locations)
-        val exclusions = descriptionExclusions.split("\n")
         val filteredLocations =
             locationFilter.filterByHaveExclusionsInDescription(locationsWithoutImage, exclusions)
         if (!filteredLocations.any()) {
+            onFinished(true)
             return
         }
 

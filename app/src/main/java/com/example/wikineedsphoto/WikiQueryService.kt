@@ -19,7 +19,10 @@ object QueryService {
     private const val MAX_LONGITUDE = 180.0
     private const val MIN_LONGITUDE = -180.0
 
-    fun getWikiLocationsForLocation(deviceLocation: com.example.wikineedsphoto.Coordinates, searchRadiusDegrees: Double): WikidataQueryResult? {
+    fun getWikiLocationsForLocation(
+        deviceLocation: com.example.wikineedsphoto.Coordinates,
+        searchRadiusDegrees: Double,
+        excludedCategories: List<String>): WikidataQueryResult? {
         val southWestCorner = Coordinates(
             latitude = addLatitude(deviceLocation.latitude, -searchRadiusDegrees),
             longitude = addLongitude(deviceLocation.longitude, -searchRadiusDegrees)
@@ -48,6 +51,7 @@ object QueryService {
               }
               FILTER(!BOUND(?discontinuedDate))
               FILTER(!BOUND(?status) || ?status = wdt:Q56556915)
+              FILTER (!BOUND(?image))
               
               SERVICE wikibase:label { 
                 bd:serviceParam wikibase:language "en,en,de,fr,es,it,nl,ru" . 
