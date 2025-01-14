@@ -3,7 +3,7 @@ name: Build and Release APK
 on:
   push:
     tags:
-      - 'v*' # Trigger on tags that start with 'v'
+      - 'v*'
 
 jobs:
   build:
@@ -21,13 +21,27 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
+        
+    - name: Decode keystore
+      run: echo ${{ secrets.KEYSTORE_BASE64 }} | base64 -d > my-release-key.jks
 
-          
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
-    - name: Build with Gradle
-      run: ./gradlew build
+
+    - name: Build APK
+      run: ./gradlew assembleRelease
+
+    - name: Sign APK
+      run: |
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+        -keystore my-release-key.jks \
+        -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+        -keypass ${{ secrets.KEY_PASSWORD }} \
+        app/build/outputs/apk/release/app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
+
+    - name: Align APK
+      run: |
+        zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release-signed-aligned.apk
 
     - name: List APK directory
       run: ls -R app/build/outputs/apk/release
@@ -35,7 +49,7 @@ jobs:
     - name: Upload to GitHub Release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: app/build/outputs/apk/release/app-release-unsigned.apk
+        artifacts: app/build/outputs/apk/release/app-release-signed-aligned.apk
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ github.ref }}
         release_name: Release ${{ github.ref_name }}
