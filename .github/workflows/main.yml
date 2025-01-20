@@ -11,6 +11,9 @@ jobs:
 
     env:
       JAVA_HOME_17_X64: /usr/lib/jvm/java-17-openjdk-amd64
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
     steps:
     - name: Checkout code
