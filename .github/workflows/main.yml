@@ -31,21 +31,6 @@ jobs:
     - name: Build APK
       run: ./gradlew assembleRelease
 
-    - name: Sign APK
-      run: |
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-        -keystore my-release-key.jks \
-        -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
-        -keypass ${{ secrets.KEY_PASSWORD }} \
-        app/build/outputs/apk/release/app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
-
-    - name: Install zipalign
-      run: sudo apt-get install -y zipalign
-
-    - name: Align APK
-      run: |
-        zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release-signed-aligned.apk
-
     - name: List APK directory
       run: ls -R app/build/outputs/apk/release
 
