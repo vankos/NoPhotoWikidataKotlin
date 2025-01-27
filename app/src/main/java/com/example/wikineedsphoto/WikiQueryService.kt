@@ -99,7 +99,7 @@ object QueryService {
     }
 
     private fun getLocationNameFromLocationInfo(locationInfo: LocationInfoRequestResult?): String? {
-        return locationInfo?.address?.suburb
+        return locationInfo?.address?.city_district
             ?: locationInfo?.address?.city
             ?: locationInfo?.address?.state
             ?: locationInfo?.address?.country
@@ -144,6 +144,7 @@ data class Address(
     val suburb: String? = null,
     val city: String? = null,
     val state: String? = null,
+    val city_district: String? = null,
 
     @JsonProperty("ISO3166-2-lvl4")
     val iso31662lvl4: String? = null,
