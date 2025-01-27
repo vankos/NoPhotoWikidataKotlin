@@ -1,3 +1,4 @@
+import androidx.compose.ui.text.intl.Locale
 import com.example.wikineedsphoto.Coordinates
 import com.example.wikineedsphoto.WikidataQueryResult
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -5,13 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.net.URL
 import java.net.URLEncoder
-import java.util.Locale
 
 object QueryService {
     private const val MAX_LATITUDE = 90.0
@@ -88,7 +85,7 @@ object QueryService {
     }
 
     suspend fun getLocationNameFromCoordinates(coordinates: Coordinates): String? {
-        val queryUrl = "https://nominatim.openstreetmap.org/reverse?lat=${coordinates.latitudeString}&lon=${coordinates.longitudeString}&format=json"
+        val queryUrl = "https://nominatim.openstreetmap.org/reverse?lat=${coordinates.latitudeString}&lon=${coordinates.longitudeString}&format=json&accept-language=${Locale.current}"
         return try {
             val jsonResponse = withContext(Dispatchers.IO) {
                  URL(queryUrl).readText()
