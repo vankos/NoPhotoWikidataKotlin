@@ -71,7 +71,7 @@ class AppSettings (
 
         val gpxGenerator = GpxGenerator()
         val gpx = gpxGenerator.generateGpxFromWikidataResult(filteredLocations)
-        val fileName = getFileName(coordinates)
+        val fileName = getFileName(coordinates, "Need photo")
         val file = File(context.getExternalFilesDir(null),fileName)
         file.writeText(gpx, Charset.defaultCharset())
         val uri: Uri = FileProvider.getUriForFile(context, "com.example.WikiNeedsPhoto.fileProvider", file)
@@ -85,17 +85,11 @@ class AppSettings (
         context.startActivity(Intent.createChooser(intent, "Open test.gpx"))
     }
 
-    private fun getFileName(coordinates: Coordinates): String {
-        var fileNamePrefix = DefualtGpxFileNamePrefix
+    private fun getFileName(coordinates: Coordinates, prefix: String): String {
         val locationName: String? = runBlocking {
             QueryService.getLocationNameFromCoordinates(coordinates)
         }
-
-        if (locationName != null) {
-            fileNamePrefix = "${locationName}_"
-        }
-
-        val fileName = "$fileNamePrefix${java.time.LocalDateTime.now()}.gpx"
-        return fileName
+        val now = java.time.LocalDateTime.now().toString().replace(":", "-")
+        return "$prefix $locationName $now.gpx"
     }
 }
