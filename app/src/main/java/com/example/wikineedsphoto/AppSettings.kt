@@ -35,20 +35,9 @@ class AppSettings (
     val buttonText = "Get GPX"
     val DefualtGpxFileNamePrefix = "NoPhotoLocations_.";
 
-    fun  getGpxCommand(context: Context, onFinished: (Boolean) -> Unit ) {
-        val locationHelper = LocationHelper(context);
-        var coordinates: Coordinates
-        locationHelper.getCurrentLocation { location ->
-            if(location == null)
-            {
-                onFinished(false)
-                return@getCurrentLocation
-            }
-
-            coordinates = Coordinates(location!!.latitude, location.longitude)
-            viewModelScope.launch{
-                withContext(Dispatchers.IO) {getGpxCommandInternal(context, coordinates, onFinished)}
-            }
+    fun  getGpxCommand(context: Context, coordinates: Coordinates, onFinished: (Boolean) -> Unit ) {
+        viewModelScope.launch{
+            withContext(Dispatchers.IO) {getGpxCommandInternal(context, coordinates, onFinished)}
         }
     }
 

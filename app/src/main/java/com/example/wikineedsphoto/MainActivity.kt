@@ -1,5 +1,6 @@
 package com.example.wikineedsphoto
 
+import LocationHelper
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,6 +13,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -166,6 +169,55 @@ class MainActivity : ComponentActivity() {
                     .padding(vertical = 8.dp)
             )
 
+            // Coordinates Label
+            Text(
+                text = "Coordinates (latitude, longitude):",
+                fontSize = 18.sp,
+                color = textColor,
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            // Coordinates input field and paste button
+            var coordinatesText by remember { mutableStateOf("") }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                OutlinedTextField(
+                    value = coordinatesText,
+                    onValueChange = { coordinatesText = it },
+                    placeholder = { Text("e.g. 40.7128, -74.0060") },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        containerColor = editorBackgroundColor,
+                        unfocusedTextColor = editorTextColor,
+                        focusedTextColor = editorTextColor
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                Button(
+                    onClick = {
+                        // Get current location and paste into coordinates field
+                        LocationHelper(context).getCurrentLocation { location ->
+                            if (location != null) {
+                                coordinatesText = "${location.latitude}, ${location.longitude}"
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                    modifier = Modifier.height(56.dp)
+                ) {
+                    Text(
+                        text = "Paste Current",
+                        color = Color.White,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
             var loading by remember { mutableStateOf(false)}
             var hasLocationAccess by remember { mutableStateOf(true)}
 
@@ -173,7 +225,7 @@ class MainActivity : ComponentActivity() {
             Button(
                 onClick = {
                     loading = true
-                    GetGpx(viewModel){
+                    GetGpx(viewModel, coordinatesText){
                         loading = false
                         hasLocationAccess = it
                     }
@@ -232,7 +284,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun GetGpx(viewModel: AppSettings, onFinished: (Boolean) -> Unit) {
+    private fun GetGpx(viewModel: AppSettings, coordinatesText: String, onFinished: (Boolean) -> Unit) {
 //        if (ActivityCompat.checkSelfPermission(
 //                this,
 //                Manifest.permission.ACCESS_FINE_LOCATION
@@ -251,8 +303,26 @@ class MainActivity : ComponentActivity() {
 //            return
 //        }
 
-        //viewModel.getGpxCommand(fusedLocationClient.lastLocation.result)
-        viewModel.getGpxCommand(this, onFinished)
+        // Parse coordinates from input field
+        if (coordinatesText.isBlank()) {
+            onFinished(false)
+            return
+        }
+        
+        val coordinatesParts = coordinatesText.split(",")
+        if (coordinatesParts.size != 2) {
+            onFinished(false)
+            return
+        }
+        
+        try {
+            val latitude = coordinatesParts[0].trim().toDouble()
+            val longitude = coordinatesParts[1].trim().toDouble()
+            val coordinates = Coordinates(latitude, longitude)
+            viewModel.getGpxCommand(this, coordinates, onFinished)
+        } catch (e: NumberFormatException) {
+            onFinished(false)
+        }
         return
     }
 
