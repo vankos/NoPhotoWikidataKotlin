@@ -309,15 +309,19 @@ class MainActivity : ComponentActivity() {
             return
         }
         
-        val coordinatesParts = coordinatesText.split(",")
+        // Split by comma or space, then filter out empty parts and trim
+        val coordinatesParts = coordinatesText.split(Regex("[, ]+"))
+            .filter { it.isNotBlank() }
+            .map { it.trim() }
+        
         if (coordinatesParts.size != 2) {
             onFinished(false)
             return
         }
         
         try {
-            val latitude = coordinatesParts[0].trim().toDouble()
-            val longitude = coordinatesParts[1].trim().toDouble()
+            val latitude = coordinatesParts[0].toDouble()
+            val longitude = coordinatesParts[1].toDouble()
             val coordinates = Coordinates(latitude, longitude)
             viewModel.getGpxCommand(this, coordinates, onFinished)
         } catch (e: NumberFormatException) {
