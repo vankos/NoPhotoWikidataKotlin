@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
 import java.net.URLEncoder
+import org.json.JSONObject
 
 object QueryService {
     private const val MAX_LATITUDE = 90.0
@@ -95,19 +96,37 @@ object QueryService {
                 connection.inputStream.bufferedReader().use { it.readText() }
             }
 
-            val locationInfo: LocationInfoRequestResult = jacksonObjectMapper().readValue(jsonResponse)
-            getLocationNameFromLocationInfo(locationInfo)
+            val jsonObject = JSONObject(jsonResponse)
+            getLocationNameFromLocationInfo(jsonObject)
         } catch (ex: Exception) {
             null
         }
     }
 
-    private fun getLocationNameFromLocationInfo(locationInfo: LocationInfoRequestResult?): String? {
-        return locationInfo?.address?.city_district
-            ?: locationInfo?.address?.city
-            ?: locationInfo?.address?.state
-            ?: locationInfo?.address?.country
-            ?: locationInfo?.display_name
+    private fun getLocationNameFromLocationInfo(jsonObject: JSONObject?): String? {
+        val address = jsonObject?.optJSONObject("address")
+        val district = address?.optString("city_district", "")?: ""
+        val town = address?.optString("town", "")?: ""
+        val city = address?.optString("city", "")?: ""
+        val province = address?.optString("province", "")?: ""
+        val state = address?.optString("state", "")?: ""
+        val region = address?.optString("region", "")?: ""
+        val country = address?.optString("country", "")?: ""
+        val displayName = address?.optString("display_name", "")?: ""
+        val final = when {
+
+            district.isNotBlank() -> district
+            town.isNotBlank() -> town
+            city.isNotBlank() -> city
+            province.isNotBlank() -> province
+            state.isNotBlank() -> state
+            region.isNotBlank() -> region
+            country.isNotBlank() -> country
+            displayName.isNotBlank() -> displayName
+            else -> ""
+        }
+
+        return final
     }
 
     private fun addLatitude(firstDegree: Double, secondDegree: Double): Double {
