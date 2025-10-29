@@ -46,12 +46,11 @@ class GpxGenerator {
     }
 
     private fun getDescription(location: Binding): String {
-        val url = location.q?.value
+        val url = location.q?.value?.replace("http://", "https://")
         val description = location.desc?.value ?: ""
         val instanceOf = location.instanceOfLabels?.value ?: ""
         val gpxDescription = "$instanceOf<br>$description<br>$url"
         return gpxDescription
     }
-
 
 }
