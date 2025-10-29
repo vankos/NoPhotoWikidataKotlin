@@ -12,31 +12,16 @@ import java.net.URLEncoder
 import org.json.JSONObject
 
 object QueryService {
-    private const val MAX_LATITUDE = 90.0
-    private const val MIN_LATITUDE = -90.0
-    private const val MAX_LONGITUDE = 180.0
-    private const val MIN_LONGITUDE = -180.0
-
     fun getWikiLocationsForLocation(
         deviceLocation: com.example.wikineedsphoto.Coordinates,
-        searchRadiusDegrees: Double,
+        searchRadiusKilometers: Double,
         excludedCategories: List<String>): WikidataQueryResult? {
-        val southWestCorner = Coordinates(
-            latitude = addLatitude(deviceLocation.latitude, -searchRadiusDegrees),
-            longitude = addLongitude(deviceLocation.longitude, -searchRadiusDegrees)
-        )
-
-        val northEastCorner = Coordinates(
-            latitude = addLatitude(deviceLocation.latitude, searchRadiusDegrees),
-            longitude = addLongitude(deviceLocation.longitude, searchRadiusDegrees)
-        )
-
         val query = """
             SELECT ?q ?qLabel ?location ?image ?desc (GROUP_CONCAT(DISTINCT ?instanceOfLabel; separator=", ") AS ?instanceOfLabels) WHERE {
-              SERVICE wikibase:box { 
+              SERVICE wikibase:around { 
                 ?q wdt:P625 ?location . 
-                bd:serviceParam wikibase:cornerSouthWest "Point(${southWestCorner.longitudeString} ${southWestCorner.latitudeString})"^^geo:wktLiteral . 
-                bd:serviceParam wikibase:cornerNorthEast "Point(${northEastCorner.longitudeString} ${northEastCorner.latitudeString})"^^geo:wktLiteral 
+                bd:serviceParam wikibase:center "Point(${deviceLocation.longitudeString} ${deviceLocation.latitudeString})"^^geo:wktLiteral . 
+                bd:serviceParam wikibase:radius "$searchRadiusKilometers" 
               } 
               OPTIONAL { ?q wdt:P18 ?image } 
               OPTIONAL { ?q wdt:P31 ?instanceOf . 
@@ -129,27 +114,6 @@ object QueryService {
         return final
     }
 
-    private fun addLatitude(firstDegree: Double, secondDegree: Double): Double {
-        var sum = firstDegree + secondDegree
-        if (sum > MAX_LATITUDE) {
-            return sum - MAX_LATITUDE
-        }
-        if (sum < MIN_LATITUDE) {
-            return MIN_LATITUDE - sum
-        }
-        return sum
-    }
-
-    private fun addLongitude(firstDegree: Double, secondDegree: Double): Double {
-        var sum = firstDegree + secondDegree
-        if (sum > MAX_LONGITUDE) {
-            return sum - MAX_LONGITUDE
-        }
-        if (sum < MIN_LONGITUDE) {
-            return MIN_LONGITUDE - sum
-        }
-        return sum
-    }
 
     private fun URL.encodeURL(): String = this.toString().replace(" ", "%20")
 }

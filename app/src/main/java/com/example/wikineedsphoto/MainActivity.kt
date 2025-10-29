@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainPage(viewModel: AppSettings = AppSettings(
-        0.05,
+        3.0,
         "hotel\n" +
                 "hostel\n" +
                 "guest house\n" +
@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
             viewModel.descriptionExclusions = savedExclusions
         val savedRadius = loadText(sharedPreferences, "searchRadius")
         if(savedRadius.isNotEmpty())
-            viewModel.searchRadiusDegrees = savedRadius.toDouble()
+            viewModel.searchRadiusKilometers = savedRadius.toDouble()
 
             // Main content
         Column(
@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
 
             // Search Radius Label
             Text(
-                text = "Search Radius in Degrees (Max 3000 points):",
+                text = "Search Radius in Kilometers (Max 3000 points):",
                 fontSize = 18.sp,
                 color = textColor,
                 modifier = Modifier.align(Alignment.Start)
@@ -126,9 +126,9 @@ class MainActivity : ComponentActivity() {
 
             // Search Radius Editor
             OutlinedTextField(
-                value = viewModel.searchRadiusDegrees.toString(),
+                value = viewModel.searchRadiusKilometers.toString(),
                 onValueChange = {
-                    viewModel.searchRadiusDegrees = it.toDouble()
+                    viewModel.searchRadiusKilometers = it.toDouble()
                     saveText(sharedPreferences, "searchRadius", it)
                     },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

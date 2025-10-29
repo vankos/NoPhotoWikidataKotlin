@@ -26,11 +26,11 @@ import java.nio.charset.Charset
 
 
 class AppSettings (
-    searchRadiusDegrees : Double,
+    searchRadiusKilometers : Double,
     descriptionExclusions : String
     ) : ViewModel()  {
 
-    var searchRadiusDegrees by mutableStateOf(searchRadiusDegrees)
+    var searchRadiusKilometers by mutableStateOf(searchRadiusKilometers)
     var descriptionExclusions by mutableStateOf(descriptionExclusions)
     val buttonText = "Get GPX"
     val DefualtGpxFileNamePrefix = "NoPhotoLocations_.";
@@ -43,7 +43,7 @@ class AppSettings (
 
     private suspend fun getGpxCommandInternal(context: Context,coordinates : Coordinates, onFinished: (Boolean) -> Unit ){
         val exclusions = descriptionExclusions.split("\n")
-        val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusDegrees, exclusions);
+        val queryResult = QueryService.getWikiLocationsForLocation(coordinates, searchRadiusKilometers, exclusions);
         val locationsWithoutImage: List<Binding>? = queryResult?.results?.bindings
         val locationFilter = LocationFilter()
         if(locationsWithoutImage == null){
