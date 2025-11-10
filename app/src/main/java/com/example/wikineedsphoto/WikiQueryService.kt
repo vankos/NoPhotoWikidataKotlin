@@ -20,7 +20,7 @@ object QueryService {
         searchRadiusKilometers: Double,
         excludedCategories: List<String>): WikidataQueryResult? {
         val query = """
-            SELECT ?q ?finalLabel ?location ?image ?desc (GROUP_CONCAT(DISTINCT ?instanceOfLabel; separator=", ") AS ?instanceOfLabels) WHERE {
+            SELECT ?q ?qLabel ?location ?image ?desc (GROUP_CONCAT(DISTINCT ?instanceOfLabel; separator=", ") AS ?instanceOfLabels) WHERE {
               {
                 SELECT ?q ?location ?image ?desc ?autoLabel (MIN(?anyLabel) AS ?fallbackLabel) WHERE {
                   SERVICE wikibase:around { 
@@ -51,9 +51,9 @@ object QueryService {
                                      FILTER (LANG(?instanceOfLabel) = "en") 
               }
               
-              BIND(IF(STRSTARTS(?autoLabel, "Q") && BOUND(?fallbackLabel), ?fallbackLabel, ?autoLabel) AS ?finalLabel)
+              BIND(IF(STRSTARTS(?autoLabel, "Q") && BOUND(?fallbackLabel), ?fallbackLabel, ?autoLabel) AS ?qLabel)
             } 
-            GROUP BY ?q ?finalLabel ?location ?image ?desc
+            GROUP BY ?q ?qLabel ?location ?image ?desc
             LIMIT 3000
             """.trimIndent()
 
