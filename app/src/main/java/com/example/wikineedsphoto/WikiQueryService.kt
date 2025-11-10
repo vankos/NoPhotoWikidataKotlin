@@ -12,6 +12,9 @@ import java.net.URLEncoder
 import org.json.JSONObject
 
 object QueryService {
+
+    private val systemLanguage = java.util.Locale.getDefault().language
+
     fun getWikiLocationsForLocation(
         deviceLocation: com.example.wikineedsphoto.Coordinates,
         searchRadiusKilometers: Double,
@@ -37,10 +40,12 @@ object QueryService {
               FILTER (!BOUND(?image))
               
               SERVICE wikibase:label { 
-                bd:serviceParam wikibase:language "en,en,de,fr,es,it,nl,ru" . 
+                bd:serviceParam wikibase:language "${systemLanguage},en,[AUTO_LANGUAGE]" . 
                 ?q schema:description ?desc . 
-                ?q rdfs:label ?qLabel 
+                ?q rdfs:label ?autoLabel .
               } 
+              
+              BIND(COALESCE(?autoLabel, ?anyLabel, STR(?q)) AS ?qLabel)
             } 
             GROUP BY ?q ?qLabel ?location ?image ?desc
             LIMIT 3000
