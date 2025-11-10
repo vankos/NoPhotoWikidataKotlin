@@ -20,37 +20,42 @@ object QueryService {
         searchRadiusKilometers: Double,
         excludedCategories: List<String>): WikidataQueryResult? {
         val query = """
-            SELECT ?q ?qLabel ?location ?image ?desc (GROUP_CONCAT(DISTINCT ?instanceOfLabel; separator=", ") AS ?instanceOfLabels) WHERE {
-              SERVICE wikibase:around { 
-                ?q wdt:P625 ?location . 
-                bd:serviceParam wikibase:center "Point(${deviceLocation.longitudeString} ${deviceLocation.latitudeString})"^^geo:wktLiteral . 
-                bd:serviceParam wikibase:radius "$searchRadiusKilometers" 
-              } 
-              OPTIONAL { ?q wdt:P18 ?image } 
+            SELECT ?q ?finalLabel ?location ?image ?desc (GROUP_CONCAT(DISTINCT ?instanceOfLabel; separator=", ") AS ?instanceOfLabels) WHERE {
+              {
+                SELECT ?q ?location ?image ?desc ?autoLabel (MIN(?anyLabel) AS ?fallbackLabel) WHERE {
+                  SERVICE wikibase:around { 
+                    ?q wdt:P625 ?location . 
+                    bd:serviceParam wikibase:center "Point(${deviceLocation.longitudeString} ${deviceLocation.latitudeString})"^^geo:wktLiteral . 
+                    bd:serviceParam wikibase:radius "$searchRadiusKilometers" 
+                  } 
+                  OPTIONAL { ?q wdt:P18 ?image } 
+                  OPTIONAL { ?q wdt:P576 ?discontinuedDate }
+                  OPTIONAL { ?q wdt:P5816 ?status }
+                  FILTER(!BOUND(?discontinuedDate))
+                  FILTER(!BOUND(?status) || ?status != wdt:Q56556915)
+                  FILTER (!BOUND(?image))
+                  
+                  SERVICE wikibase:label { 
+                    bd:serviceParam wikibase:language "${systemLanguage},en,[AUTO_LANGUAGE]" . 
+                    ?q schema:description ?desc . 
+                    ?q rdfs:label ?autoLabel .
+                  }
+                  
+                  OPTIONAL { ?q rdfs:label ?anyLabel . }
+                }
+                GROUP BY ?q ?location ?image ?desc ?autoLabel
+              }
+              
               OPTIONAL { ?q wdt:P31 ?instanceOf . 
-                         ?instanceOf rdfs:label ?instanceOfLabel . 
-                         FILTER (LANG(?instanceOfLabel) = "en") 
+                                     ?instanceOf rdfs:label ?instanceOfLabel . 
+                                     FILTER (LANG(?instanceOfLabel) = "en") 
               }
-              OPTIONAL { ?q wdt:P576 ?discontinuedDate }
-              OPTIONAL { 
-                  ?q wdt:P5816 ?status
-              }
-              FILTER(!BOUND(?discontinuedDate))
-              FILTER(!BOUND(?status) || ?status != wdt:Q56556915)
-              FILTER (!BOUND(?image))
               
-              OPTIONAL { ?q rdfs:label ?anyLabel . }
-              SERVICE wikibase:label { 
-                bd:serviceParam wikibase:language "${systemLanguage},en,[AUTO_LANGUAGE]" . 
-                ?q schema:description ?desc . 
-                ?q rdfs:label ?autoLabel .
-              } 
-              
-              BIND(COALESCE(?autoLabel, ?anyLabel, STR(?q)) AS ?qLabel)
+              BIND(IF(STRSTARTS(?autoLabel, "Q") && BOUND(?fallbackLabel), ?fallbackLabel, ?autoLabel) AS ?finalLabel)
             } 
-            GROUP BY ?q ?qLabel ?location ?image ?desc
+            GROUP BY ?q ?finalLabel ?location ?image ?desc
             LIMIT 3000
-        """.trimIndent()
+            """.trimIndent()
 
         val url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=${URLEncoder.encode(query)}&format=json"
         return try {
