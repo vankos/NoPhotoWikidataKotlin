@@ -39,6 +39,7 @@ object QueryService {
               FILTER(!BOUND(?status) || ?status != wdt:Q56556915)
               FILTER (!BOUND(?image))
               
+              OPTIONAL { ?q rdfs:label ?anyLabel . }
               SERVICE wikibase:label { 
                 bd:serviceParam wikibase:language "${systemLanguage},en,[AUTO_LANGUAGE]" . 
                 ?q schema:description ?desc . 
