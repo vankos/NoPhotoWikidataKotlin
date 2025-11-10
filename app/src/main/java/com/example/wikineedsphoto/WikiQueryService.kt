@@ -33,7 +33,7 @@ object QueryService {
                   ?q wdt:P5816 ?status
               }
               FILTER(!BOUND(?discontinuedDate))
-              FILTER(!BOUND(?status) || ?status = wdt:Q56556915)
+              FILTER(!BOUND(?status) || ?status != wdt:Q56556915)
               FILTER (!BOUND(?image))
               
               SERVICE wikibase:label { 
