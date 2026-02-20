@@ -31,6 +31,7 @@ class AppSettings (
     ) : ViewModel()  {
 
     var searchRadiusKilometers by mutableStateOf(searchRadiusKilometers)
+    var searchRadiusText by mutableStateOf(searchRadiusKilometers.toString())
     var descriptionExclusions by mutableStateOf(descriptionExclusions)
     val buttonText = "Get GPX"
     val DefualtGpxFileNamePrefix = "NoPhotoLocations_.";

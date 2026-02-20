@@ -89,8 +89,10 @@ class MainActivity : ComponentActivity() {
         if(savedExclusions.isNotEmpty())
             viewModel.descriptionExclusions = savedExclusions
         val savedRadius = loadText(sharedPreferences, "searchRadius")
-        if(savedRadius.isNotEmpty())
-            viewModel.searchRadiusKilometers = savedRadius.toDouble()
+        if(savedRadius.isNotEmpty()) {
+            viewModel.searchRadiusText = savedRadius
+            savedRadius.toDoubleOrNull()?.let { viewModel.searchRadiusKilometers = it }
+        }
 
             // Main content
         Column(
@@ -126,9 +128,10 @@ class MainActivity : ComponentActivity() {
 
             // Search Radius Editor
             OutlinedTextField(
-                value = viewModel.searchRadiusKilometers.toString(),
+                value = viewModel.searchRadiusText,
                 onValueChange = {
-                    viewModel.searchRadiusKilometers = it.toDouble()
+                    viewModel.searchRadiusText = it
+                    it.toDoubleOrNull()?.let { v -> viewModel.searchRadiusKilometers = v }
                     saveText(sharedPreferences, "searchRadius", it)
                     },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
